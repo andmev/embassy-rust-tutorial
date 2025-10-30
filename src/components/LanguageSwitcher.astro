@@ -1,0 +1,63 @@
+---
+import { languages } from '../i18n/ui';
+
+const currentPath = Astro.url.pathname;
+const currentLocale = currentPath.split('/')[1];
+const isDefaultLocale = !['es', 'de'].includes(currentLocale);
+
+// Get the base path without locale prefix
+const basePath = isDefaultLocale 
+  ? currentPath 
+  : currentPath.replace(`/${currentLocale}`, '');
+
+// Generate locale links
+const localeLinks = Object.entries(languages).map(([code, label]) => {
+  const href = code === 'en' ? basePath : `/${code}${basePath}`;
+  const isActive = code === (isDefaultLocale ? 'en' : currentLocale);
+  return { code, label, href, isActive };
+});
+---
+
+<div class="language-switcher">
+  <label for="language-select">Language:</label>
+  <select id="language-select" onchange="window.location.href = this.value">
+    {localeLinks.map(({ code, label, href, isActive }) => (
+      <option value={href} selected={isActive}>
+        {label}
+      </option>
+    ))}
+  </select>
+</div>
+
+<style>
+  .language-switcher {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  label {
+    font-size: 0.875rem;
+    color: var(--sl-color-gray-3);
+  }
+
+  select {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.25rem;
+    background: var(--sl-color-bg-nav);
+    color: var(--sl-color-white);
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  select:hover {
+    border-color: var(--sl-color-accent);
+  }
+
+  select:focus {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+</style>
